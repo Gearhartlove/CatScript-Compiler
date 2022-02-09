@@ -19,6 +19,7 @@ public class CatScriptTokenizer {
     private void tokenize() {
         consumeWhitespace();
         while (!tokenizationEnd()) {
+            // scan's the token and has tokenList.addToken  embedded
             scanToken();
             consumeWhitespace();
         }
@@ -40,6 +41,28 @@ public class CatScriptTokenizer {
 
     private boolean scanString() {
         // TODO implement string scanning here!
+        if (peek() == '"') {
+            postion++; // skip
+            int start = postion;
+            while (peek() != '"' && !tokenizationEnd()) {
+                if (peek() == '\n') {
+                    line++;
+                }
+                postion++;
+            }
+            if (tokenizationEnd()) {
+                tokenList.addToken(ERROR, "Unreachable String", start, postion, line, lineOffset);
+                return false;
+            }
+
+            // the closing "
+            takeChar();
+
+            // Trim the surrouncing quotes
+            String value = src.substring(start, postion - 1);
+            tokenList.addToken(STRING, value, start, postion, line, lineOffset);
+            return true;
+        }
         return false;
     }
 
@@ -82,13 +105,14 @@ public class CatScriptTokenizer {
             tokenList.addToken(PLUS, "+", start, postion, line, lineOffset);
         } else if(matchAndConsume('-')) {
             tokenList.addToken(MINUS, "-", start, postion, line, lineOffset);
+            //test
         } else if(matchAndConsume('/')) {
             if (matchAndConsume('/')) {
                 while (peek() != '\n' && !tokenizationEnd()) {
                     takeChar();
                 }
             } else {
-                tokenList.addToken(SLASH, "-", start, postion, line, lineOffset);
+                tokenList.addToken(SLASH, "/", start, postion, line, lineOffset);
             }
         } else if(matchAndConsume('=')) {
             if (matchAndConsume('=')) {
