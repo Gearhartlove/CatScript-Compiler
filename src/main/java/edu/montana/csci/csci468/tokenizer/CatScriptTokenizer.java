@@ -42,23 +42,29 @@ public class CatScriptTokenizer {
     private boolean scanString() {
         // TODO implement string scanning here!
         if (peek() == '"') {
-            postion++; // skip
-            int start = postion;
+            takeChar();
+            int start = postion; //start char of word
             while (peek() != '"' && !tokenizationEnd()) {
-                if (peek() == '\n') {
-                    line++;
+                if (peek() == '\\') {
+                    takeChar();
+                    if (peek() == '"') {
+                        takeChar();
+                    }
                 }
-                postion++;
+                else {
+                    takeChar();
+                }
             }
             if (tokenizationEnd()) {
+                // TODO Q: Should the errors for unreachable string and escaped strings be the same?
                 tokenList.addToken(ERROR, "Unreachable String", start, postion, line, lineOffset);
-                return false;
+                return true;
             }
 
             // the closing "
             takeChar();
 
-            // Trim the surrouncing quotes
+            // Trim the surrounding quotes
             String value = src.substring(start, postion - 1);
             tokenList.addToken(STRING, value, start, postion, line, lineOffset);
             return true;
@@ -99,19 +105,58 @@ public class CatScriptTokenizer {
 
     private void scanSyntax() {
         // TODO - implement rest of syntax scanning
-        //      - implement comments
+        //      - implement comments [DONE]
         int start = postion;
         if(matchAndConsume('+')) {
             tokenList.addToken(PLUS, "+", start, postion, line, lineOffset);
         } else if(matchAndConsume('-')) {
             tokenList.addToken(MINUS, "-", start, postion, line, lineOffset);
-            //test
-        } else if(matchAndConsume('/')) {
+        } else if (matchAndConsume('(')) {
+            tokenList.addToken(LEFT_PAREN, "(", start, postion, line, lineOffset);
+        } else if (matchAndConsume(')')) {
+            tokenList.addToken(RIGHT_PAREN, ")", start, postion, line, lineOffset);
+        } else if (matchAndConsume('[')) {
+            tokenList.addToken(LEFT_BRACKET, "[", start, postion, line, lineOffset);
+        } else if (matchAndConsume(']')) {
+            tokenList.addToken(RIGHT_BRACKET, "]", start, postion, line, lineOffset);
+        } else if (matchAndConsume('{')) {
+            tokenList.addToken(LEFT_BRACE, "}", start, postion, line, lineOffset);
+        } else if (matchAndConsume('}')) {
+            tokenList.addToken(RIGHT_BRACE, "]", start, postion, line, lineOffset);
+        } else if (matchAndConsume(':')) {
+            tokenList.addToken(COLON, ":", start, postion, line, lineOffset);
+        } else if (matchAndConsume(',')) {
+            tokenList.addToken(COMMA, ",", start, postion, line, lineOffset);
+        } else if (matchAndConsume('.')) {
+            tokenList.addToken(DOT, ".", start, postion, line, lineOffset);
+        } else if (matchAndConsume('*')) {
+            tokenList.addToken(STAR, "*", start, postion, line, lineOffset);
+        } else if (matchAndConsume('>')) {
+            if (matchAndConsume('=')) {
+                tokenList.addToken(GREATER_EQUAL, ">=", start, postion, line, lineOffset);
+            } else {
+                tokenList.addToken(GREATER, ">", start, postion, line, lineOffset);
+            }
+        } else if (matchAndConsume('<')) {
+            if (matchAndConsume('=')) {
+                tokenList.addToken(LESS_EQUAL, "<=", start, postion, line, lineOffset);
+            } else {
+                tokenList.addToken(LESS, "<", start, postion, line, lineOffset);
+            }
+        } else if (matchAndConsume('!')) {
+            if (matchAndConsume('=')) {
+                tokenList.addToken(BANG_EQUAL, "!=", start, postion, line, lineOffset);
+            }
+        }
+
+        else if(matchAndConsume('/')) {
             if (matchAndConsume('/')) {
                 while (peek() != '\n' && !tokenizationEnd()) {
                     takeChar();
                 }
-            } else {
+            }
+            else
+            {
                 tokenList.addToken(SLASH, "/", start, postion, line, lineOffset);
             }
         } else if(matchAndConsume('=')) {
