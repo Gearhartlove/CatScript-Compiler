@@ -147,16 +147,12 @@ public class CatScriptTokenizer {
             if (matchAndConsume('=')) {
                 tokenList.addToken(BANG_EQUAL, "!=", start, postion, line, lineOffset);
             }
-        }
-
-        else if(matchAndConsume('/')) {
+        } else if (matchAndConsume('/')) {
             if (matchAndConsume('/')) {
                 while (peek() != '\n' && !tokenizationEnd()) {
                     takeChar();
                 }
-            }
-            else
-            {
+            } else {
                 tokenList.addToken(SLASH, "/", start, postion, line, lineOffset);
             }
         } else if(matchAndConsume('=')) {
@@ -176,9 +172,12 @@ public class CatScriptTokenizer {
             char c = peek();
             if (c == ' ' || c == '\r' || c == '\t') {
                 postion++;
+                lineOffset++;
                 continue;
             } else if (c == '\n') {
                 postion++;
+                lineOffset = 0; // reset line offset
+                line++;
                 continue;
             }
             break;
@@ -211,6 +210,7 @@ public class CatScriptTokenizer {
     private char takeChar() {
         char c = src.charAt(postion);
         postion++;
+        lineOffset++;
         return c;
     }
 
