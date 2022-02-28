@@ -146,6 +146,8 @@ public class CatScriptTokenizer {
         } else if (matchAndConsume('!')) {
             if (matchAndConsume('=')) {
                 tokenList.addToken(BANG_EQUAL, "!=", start, postion, line, lineOffset);
+            } else {
+                tokenList.addToken(NOT, "!", start, postion, line, lineOffset);
             }
         } else if (matchAndConsume('/')) {
             if (matchAndConsume('/')) {

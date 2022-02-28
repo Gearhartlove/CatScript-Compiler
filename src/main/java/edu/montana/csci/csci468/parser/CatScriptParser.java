@@ -111,13 +111,25 @@ public class CatScriptParser {
         }
     }
 
+    // do I need to implement every other type?
     private Expression parsePrimaryExpression() {
         if (tokens.match(INTEGER)) {
             Token integerToken = tokens.consumeToken();
             IntegerLiteralExpression integerExpression = new IntegerLiteralExpression(integerToken.getStringValue());
             integerExpression.setToken(integerToken);
             return integerExpression;
-        } else {
+        } else if (tokens.match(TRUE)){
+            Token booleanToken = tokens.consumeToken();
+            BooleanLiteralExpression booleanExpression = new BooleanLiteralExpression(Boolean.parseBoolean(booleanToken.getStringValue()));
+            booleanExpression.setToken(booleanToken);
+            return booleanExpression;
+        } else if (tokens.match(FALSE)) {
+            Token booleanToken = tokens.consumeToken();
+            BooleanLiteralExpression booleanExpression = new BooleanLiteralExpression(Boolean.parseBoolean(booleanToken.getStringValue()));
+            booleanExpression.setToken(booleanToken);
+            return booleanExpression;
+        }
+        else {
             SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression(tokens.consumeToken());
             return syntaxErrorExpression;
         }
