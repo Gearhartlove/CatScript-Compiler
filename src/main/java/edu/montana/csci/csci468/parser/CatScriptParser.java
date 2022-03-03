@@ -85,19 +85,34 @@ public class CatScriptParser {
     //============================================================
 
     private Expression parseExpression() {
+        // ComparisonExpression ?
+
         return parseAdditiveExpression();
     }
 
     private Expression parseAdditiveExpression() {
         Expression expression = parseUnaryExpression();
         Expression rightHandSide;
+        while (tokens.match(STAR, SLASH)) {
+            Token operator = tokens.consumeToken();
+            if (tokens.match(LEFT_PAREN)) {
+                tokens.consumeToken();
+                rightHandSide = new ParenthesizedExpression(parseAdditiveExpression());
+                tokens.consumeToken(); // consume right paren
+            } else {
+                rightHandSide = parseUnaryExpression();
+            }
+            FactorExpression factorExpression = new FactorExpression(operator, expression, rightHandSide);
+            factorExpression.setStart(expression.getStart());
+            factorExpression.setEnd(rightHandSide.getEnd());
+            expression = factorExpression;
+        }
         while (tokens.match(PLUS, MINUS)) {
             Token operator = tokens.consumeToken();
             if (tokens.match(LEFT_PAREN)) {
                 tokens.consumeToken();
                 rightHandSide = new ParenthesizedExpression(parseAdditiveExpression());
                 tokens.consumeToken(); // consume right paren
-
             } else {
                 rightHandSide = parseUnaryExpression();
             }
@@ -106,6 +121,7 @@ public class CatScriptParser {
             additiveExpression.setEnd(rightHandSide.getEnd());
             expression = additiveExpression;
         }
+
         return expression;
     }
 

@@ -146,6 +146,7 @@ public class CatscriptParserExpressionsTest extends CatscriptTestBase {
         assertFalse(expr.isMultiply());
     }
 
+    //stuck on this test
     @Test
     public void parseFactorIsHigherPrecendenceThanAdd() {
         AdditiveExpression  expr = parseExpression("1 * 1 + 1 / 1");
