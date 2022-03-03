@@ -7,6 +7,9 @@ import edu.montana.csci.csci468.tokenizer.Token;
 import edu.montana.csci.csci468.tokenizer.TokenList;
 import edu.montana.csci.csci468.tokenizer.TokenType;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import static edu.montana.csci.csci468.tokenizer.TokenType.*;
 
 public class CatScriptParser {
@@ -87,9 +90,17 @@ public class CatScriptParser {
 
     private Expression parseAdditiveExpression() {
         Expression expression = parseUnaryExpression();
+        Expression rightHandSide;
         while (tokens.match(PLUS, MINUS)) {
             Token operator = tokens.consumeToken();
-            final Expression rightHandSide = parseUnaryExpression();
+            if (tokens.match(LEFT_PAREN)) {
+                tokens.consumeToken();
+                rightHandSide = new ParenthesizedExpression(parseAdditiveExpression());
+                tokens.consumeToken(); // consume right paren
+
+            } else {
+                rightHandSide = parseUnaryExpression();
+            }
             AdditiveExpression additiveExpression = new AdditiveExpression(operator, expression, rightHandSide);
             additiveExpression.setStart(expression.getStart());
             additiveExpression.setEnd(rightHandSide.getEnd());
@@ -111,7 +122,7 @@ public class CatScriptParser {
         }
     }
 
-    // do I need to implement every other type?
+    // TODO: implement functional_call, expression
     private Expression parsePrimaryExpression() {
         if (tokens.match(INTEGER)) {
             Token integerToken = tokens.consumeToken();
@@ -128,8 +139,62 @@ public class CatScriptParser {
             BooleanLiteralExpression booleanExpression = new BooleanLiteralExpression(Boolean.parseBoolean(booleanToken.getStringValue()));
             booleanExpression.setToken(booleanToken);
             return booleanExpression;
-        }
-        else {
+        } else if (tokens.match(IDENTIFIER)) {
+            Token identifierToken = tokens.consumeToken();
+            if (tokens.match(LEFT_PAREN)) {
+                tokens.consumeToken();
+                // function logic
+                LinkedList<Expression> arguments = new LinkedList<>();
+                while (!tokens.match(RIGHT_PAREN) && !tokens.match(EOF)) {
+
+                    Expression e = parseExpression(); // return the argument
+                    arguments.add(e);
+                    if (tokens.match(EOF)) {
+                        FunctionCallExpression functionCallExpression =
+                                new FunctionCallExpression(identifierToken.getStringValue(), arguments);
+                        functionCallExpression.addError(ErrorType.UNTERMINATED_ARG_LIST);
+                        return functionCallExpression;
+                    }
+                    tokens.consumeToken(); // consume the '(', or the ','
+                }
+                FunctionCallExpression functionCallExpression =
+                        new FunctionCallExpression(identifierToken.getStringValue(), arguments);
+                return functionCallExpression;
+            } else {
+                IdentifierExpression identExpression = new IdentifierExpression(identifierToken.getStringValue());
+                identExpression.setToken(identifierToken);
+                return identExpression;
+            }
+        } else if (tokens.match(STRING)) {
+            Token stringToken = tokens.consumeToken();
+            StringLiteralExpression stringExpression = new StringLiteralExpression(stringToken.getStringValue());
+            stringExpression.setToken(stringToken);
+            return stringExpression;
+        } else if (tokens.match(NULL)) {
+            Token nullToken = tokens.consumeToken();
+            NullLiteralExpression nullLiteralExpression = new NullLiteralExpression();
+            nullLiteralExpression.setToken(nullToken);
+            return nullLiteralExpression;
+        } else if (tokens.match(LEFT_BRACKET)) {
+            List<Expression> list = new LinkedList<>();
+            Token listLiteralToken = tokens.consumeToken(); // consume the '['
+            // while loop until match the right brace
+            while (!tokens.match(RIGHT_BRACKET)) {
+                if (tokens.match(EOF)) {
+                    ListLiteralExpression listLiteralExpression = new ListLiteralExpression(list);
+                    listLiteralExpression.addError(ErrorType.UNTERMINATED_LIST);
+                    return listLiteralExpression;
+                }
+                Expression e = parseExpression();
+                list.add(e);
+                if (!tokens.match(RIGHT_BRACKET) && !tokens.match(EOF)) {
+                    tokens.consumeToken(); // consume the ','
+                }
+            }
+            tokens.consumeToken();
+            ListLiteralExpression listLiteralExpression = new ListLiteralExpression(list);
+            return listLiteralExpression;
+        } else {
             SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression(tokens.consumeToken());
             return syntaxErrorExpression;
         }
