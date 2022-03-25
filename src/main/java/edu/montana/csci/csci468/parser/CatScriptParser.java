@@ -88,6 +88,27 @@ public class CatScriptParser {
         return parseEqualityExpression();
     }
 
+    private FunctionCallExpression parseFunctionCallExpression(Token identifierToken) {
+        tokens.consumeToken();
+        // function logic
+        LinkedList<Expression> arguments = new LinkedList<>();
+        while (!tokens.match(RIGHT_PAREN) && !tokens.match(EOF)) {
+
+            Expression e = parseExpression(); // return the argument
+            arguments.add(e);
+            if (tokens.match(EOF)) {
+                FunctionCallExpression functionCallExpression =
+                        new FunctionCallExpression(identifierToken.getStringValue(), arguments);
+                functionCallExpression.addError(ErrorType.UNTERMINATED_ARG_LIST);
+                return functionCallExpression;
+            }
+            tokens.consumeToken(); // consume the '(', or the ','
+        }
+        FunctionCallExpression functionCallExpression =
+                new FunctionCallExpression(identifierToken.getStringValue(), arguments);
+        return functionCallExpression;
+    }
+
     private Expression parseEqualityExpression() {
         Expression expression = parseComparisonExpression();
         while (tokens.match(EQUAL_EQUAL, BANG_EQUAL)) {
@@ -188,23 +209,7 @@ public class CatScriptParser {
         } else if (tokens.match(IDENTIFIER)) {
             Token identifierToken = tokens.consumeToken();
             if (tokens.match(LEFT_PAREN)) {
-                tokens.consumeToken();
-                // function logic
-                LinkedList<Expression> arguments = new LinkedList<>();
-                while (!tokens.match(RIGHT_PAREN) && !tokens.match(EOF)) {
-
-                    Expression e = parseExpression(); // return the argument
-                    arguments.add(e);
-                    if (tokens.match(EOF)) {
-                        FunctionCallExpression functionCallExpression =
-                                new FunctionCallExpression(identifierToken.getStringValue(), arguments);
-                        functionCallExpression.addError(ErrorType.UNTERMINATED_ARG_LIST);
-                        return functionCallExpression;
-                    }
-                    tokens.consumeToken(); // consume the '(', or the ','
-                }
-                FunctionCallExpression functionCallExpression =
-                        new FunctionCallExpression(identifierToken.getStringValue(), arguments);
+                FunctionCallExpression functionCallExpression = parseFunctionCallExpression(identifierToken);
                 return functionCallExpression;
             } else {
                 IdentifierExpression identExpression = new IdentifierExpression(identifierToken.getStringValue());
@@ -245,6 +250,8 @@ public class CatScriptParser {
             return syntaxErrorExpression;
         }
     }
+
+
 
     //============================================================
     //  Parse Helpers
