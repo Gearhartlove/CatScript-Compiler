@@ -141,13 +141,14 @@ public class CatScriptParser {
         Expression rightHandSide;
         while (tokens.match(PLUS, MINUS)) {
             Token operator = tokens.consumeToken();
-            if (tokens.match(LEFT_PAREN)) {
-                tokens.consumeToken();
-                rightHandSide = new ParenthesizedExpression(parseFactorExpression());
-                tokens.consumeToken(); // consume right paren
-            } else {
-                rightHandSide = parseUnaryExpression();
-            }
+            rightHandSide = parseFactorExpression();
+//            if (tokens.match(LEFT_PAREN)) {
+//                tokens.consumeToken();
+//                rightHandSide = new ParenthesizedExpression(parseFactorExpression());
+//                tokens.consumeToken(); // consume right paren
+//            } else {
+//                rightHandSide = parseUnaryExpression();
+//            }
             AdditiveExpression additiveExpression = new AdditiveExpression(operator, expression, rightHandSide);
             additiveExpression.setStart(expression.getStart());
             additiveExpression.setEnd(rightHandSide.getEnd());
@@ -162,13 +163,14 @@ public class CatScriptParser {
         Expression rightHandSide;
         while (tokens.match(STAR, SLASH)) {
             Token operator = tokens.consumeToken();
-            if (tokens.match(LEFT_PAREN)) {
-                tokens.consumeToken();
-                rightHandSide = new ParenthesizedExpression(parseAdditiveExpression());
-                tokens.consumeToken(); // consume right paren
-            } else {
-                rightHandSide = parseUnaryExpression();
-            }
+//            if (tokens.match(LEFT_PAREN)) {
+//                tokens.consumeToken();
+//                rightHandSide = new ParenthesizedExpression(parseAdditiveExpression());
+//                tokens.consumeToken(); // consume right paren
+//            } else {
+//                rightHandSide = parseUnaryExpression();
+//            }
+            rightHandSide = parseUnaryExpression();
             FactorExpression factorExpression = new FactorExpression(operator, expression, rightHandSide);
             factorExpression.setStart(expression.getStart());
             factorExpression.setEnd(rightHandSide.getEnd());
@@ -176,6 +178,29 @@ public class CatScriptParser {
         }
         return expression;
     }
+
+    private Expression parseListLiteralExpression() {
+        List<Expression> list = new LinkedList<>();
+        Token listLiteralToken = tokens.consumeToken(); // consume the '['
+        // while loop until match the right brace
+        while (!tokens.match(RIGHT_BRACKET)) {
+            if (tokens.match(EOF)) {
+                ListLiteralExpression listLiteralExpression = new ListLiteralExpression(list);
+                listLiteralExpression.addError(ErrorType.UNTERMINATED_LIST);
+                return listLiteralExpression;
+            }
+            Expression e = parseExpression();
+            list.add(e);
+            if (!tokens.match(RIGHT_BRACKET) && !tokens.match(EOF)) {
+                tokens.consumeToken(); // consume the ','
+            }
+        }
+        tokens.consumeToken();
+        ListLiteralExpression listLiteralExpression = new ListLiteralExpression(list);
+        return listLiteralExpression;
+    }
+
+
 
     private Expression parseUnaryExpression() {
         if (tokens.match(MINUS, NOT)) {
@@ -227,25 +252,14 @@ public class CatScriptParser {
             nullLiteralExpression.setToken(nullToken);
             return nullLiteralExpression;
         } else if (tokens.match(LEFT_BRACKET)) {
-            List<Expression> list = new LinkedList<>();
-            Token listLiteralToken = tokens.consumeToken(); // consume the '['
-            // while loop until match the right brace
-            while (!tokens.match(RIGHT_BRACKET)) {
-                if (tokens.match(EOF)) {
-                    ListLiteralExpression listLiteralExpression = new ListLiteralExpression(list);
-                    listLiteralExpression.addError(ErrorType.UNTERMINATED_LIST);
-                    return listLiteralExpression;
-                }
-                Expression e = parseExpression();
-                list.add(e);
-                if (!tokens.match(RIGHT_BRACKET) && !tokens.match(EOF)) {
-                    tokens.consumeToken(); // consume the ','
-                }
-            }
-            tokens.consumeToken();
-            ListLiteralExpression listLiteralExpression = new ListLiteralExpression(list);
-            return listLiteralExpression;
-        } else {
+            return parseListLiteralExpression();
+        } else if(tokens.match(LEFT_PAREN)) {
+            Token left_paren_token = tokens.consumeToken();
+            ParenthesizedExpression parenthesizedExpression = new ParenthesizedExpression(parseExpression());
+            parenthesizedExpression.setToken(left_paren_token);
+            return parenthesizedExpression;
+        }
+        else {
             SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression(tokens.consumeToken());
             return syntaxErrorExpression;
         }
