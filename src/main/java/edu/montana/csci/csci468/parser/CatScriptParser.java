@@ -58,6 +58,14 @@ public class CatScriptParser {
     //============================================================
 
     private Statement parseProgramStatement() {
+        if (tokens.match(VAR)) {
+            Statement varStmt = parseVariableStatement();
+            return varStmt;
+        }
+        if (tokens.match(IF)) {
+            Statement ifStmt = parseIfStatement();
+            return ifStmt;
+        }
         if (tokens.match(FOR)) {
             Statement forStmt = parseForStatement();
             return forStmt;
@@ -93,7 +101,7 @@ public class CatScriptParser {
             ForStatement forStatement = new ForStatement();
             forStatement.setStart(tokens.consumeToken());
             require(LEFT_PAREN, forStatement);
-            IdentifierExpression id = (IdentifierExpression) parseExpression();
+            IdentifierExpression id = (IdentifierExpression) parseExpression(); // REFAC: what's the best way to do this?
             forStatement.setVariableName(id.getName());
             require(IN,forStatement);
             Expression expression = parseExpression();
@@ -102,7 +110,7 @@ public class CatScriptParser {
             require(LEFT_BRACE, forStatement);
             // add the statements to the for loop
             List<Statement> statement_list = new LinkedList<>();
-            while (!tokens.match(RIGHT_BRACE)) {
+            while (!tokens.match(RIGHT_BRACE) && !tokens.match(EOF)) { // REFAC: is EOF the best way of doing this ?
                 statement_list.add(parseProgramStatement());
             }
             forStatement.setBody(statement_list);
@@ -112,6 +120,62 @@ public class CatScriptParser {
             return new SyntaxErrorStatement(tokens.consumeToken());
         }
     }
+
+    private Statement parseIfStatement() {
+        if (tokens.match(IF)) {
+            IfStatement ifStatement = new IfStatement();
+            ifStatement.setStart(tokens.consumeToken());
+            require(LEFT_PAREN, ifStatement);
+            Expression ifExpression = parseExpression();
+            ifStatement.setExpression(ifExpression);
+            require(RIGHT_PAREN, ifStatement);
+            require(LEFT_BRACE, ifStatement);
+            List<Statement> trueStatementsList= new LinkedList<>();
+            while (!tokens.match(RIGHT_BRACE) && !tokens.match(EOF)) {
+                trueStatementsList.add(parseProgramStatement());
+            }
+            ifStatement.setTrueStatements(trueStatementsList);
+            require(RIGHT_BRACE, ifStatement);
+
+            if (tokens.match(ELSE)) {
+                tokens.consumeToken(); // consume the else
+                if (tokens.match(IF)) {
+                    parseIfStatement();
+                } else {
+                    require(LEFT_BRACE, ifStatement);
+                    List<Statement> elseStatementsList = new LinkedList<>();
+                    while (!tokens.match(RIGHT_BRACE) && !tokens.match(EOF)) {
+                        elseStatementsList.add(parseProgramStatement());
+                    }
+                    ifStatement.setElseStatements(elseStatementsList);
+                    ifStatement.setEnd(require(RIGHT_BRACE, ifStatement));
+                }
+            }
+            return ifStatement;
+        } else {
+            return new SyntaxErrorStatement(tokens.consumeToken());
+        }
+    }
+
+    private Statement parseVariableStatement() {
+        if (tokens.match(VAR)) {
+            VariableStatement varStatement = new VariableStatement();
+            varStatement.setStart(tokens.consumeToken());
+            IdentifierExpression id = (IdentifierExpression) parseExpression();
+            varStatement.setVariableName(id.getName());
+            if (tokens.match(COLON)) {
+                tokens.consumeToken(); // consume the colon
+                varStatement.setExplicitType(parseTypeExpression());
+            }
+            require(EQUAL, varStatement);
+            varStatement.setExpression(parseExpression());
+
+            return varStatement;
+        } else {
+            return new SyntaxErrorStatement(tokens.consumeToken());
+        }
+    }
+
 
     //============================================================
     //  Expressions
@@ -293,6 +357,17 @@ public class CatScriptParser {
         else {
             SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression(tokens.consumeToken());
             return syntaxErrorExpression;
+        }
+    }
+
+    // RFC: is there a better way of doing this?
+    private CatscriptType parseTypeExpression() {
+        Token type = tokens.consumeToken();
+        if (type.getStringValue().equals("int")) {
+            return CatscriptType.INT;
+        }
+        else {
+            return CatscriptType.NULL; // RFC: change this later
         }
     }
 
