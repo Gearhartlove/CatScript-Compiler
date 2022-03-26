@@ -120,9 +120,9 @@ public class CatScriptTokenizer {
         } else if (matchAndConsume(']')) {
             tokenList.addToken(RIGHT_BRACKET, "]", start, postion, line, lineOffset);
         } else if (matchAndConsume('{')) {
-            tokenList.addToken(LEFT_BRACE, "}", start, postion, line, lineOffset);
+            tokenList.addToken(LEFT_BRACE, "{", start, postion, line, lineOffset);
         } else if (matchAndConsume('}')) {
-            tokenList.addToken(RIGHT_BRACE, "]", start, postion, line, lineOffset);
+            tokenList.addToken(RIGHT_BRACE, "}", start, postion, line, lineOffset);
         } else if (matchAndConsume(':')) {
             tokenList.addToken(COLON, ":", start, postion, line, lineOffset);
         } else if (matchAndConsume(',')) {

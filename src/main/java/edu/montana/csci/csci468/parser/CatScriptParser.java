@@ -25,6 +25,7 @@ public class CatScriptParser {
         program.setStart(tokens.getCurrentToken());
         Expression expression = null;
         try {
+            //todo() I mutate the '{' into '}' and the '}' into ']'
             expression = parseExpression();
         } catch(RuntimeException re) {
             // ignore :)
@@ -57,10 +58,17 @@ public class CatScriptParser {
     //============================================================
 
     private Statement parseProgramStatement() {
-        Statement printStmt = parsePrintStatement();
-        if (printStmt != null) {
-            return printStmt;
+        if (tokens.match(FOR)) {
+            Statement forStmt = parseForStatement();
+            return forStmt;
         }
+        else if (tokens.match(PRINT)) {
+            Statement printStmt = parsePrintStatement();
+            if (printStmt != null) {
+                return printStmt;
+            }
+        }
+
         return new SyntaxErrorStatement(tokens.consumeToken());
     }
 
@@ -77,6 +85,31 @@ public class CatScriptParser {
             return printStatement;
         } else {
             return null;
+        }
+    }
+
+    private Statement parseForStatement() {
+        if (tokens.match(FOR)) {
+            ForStatement forStatement = new ForStatement();
+            forStatement.setStart(tokens.consumeToken());
+            require(LEFT_PAREN, forStatement);
+            IdentifierExpression id = (IdentifierExpression) parseExpression();
+            forStatement.setVariableName(id.getName());
+            require(IN,forStatement);
+            Expression expression = parseExpression();
+            forStatement.setExpression(expression);
+            require(RIGHT_PAREN, forStatement);
+            require(LEFT_BRACE, forStatement);
+            // add the statements to the for loop
+            List<Statement> statement_list = new LinkedList<>();
+            while (!tokens.match(RIGHT_BRACE)) {
+                statement_list.add(parseProgramStatement());
+            }
+            forStatement.setBody(statement_list);
+            forStatement.setEnd(require(RIGHT_BRACE, forStatement));
+            return forStatement;
+        } else {
+            return new SyntaxErrorStatement(tokens.consumeToken());
         }
     }
 
@@ -200,8 +233,6 @@ public class CatScriptParser {
         return listLiteralExpression;
     }
 
-
-
     private Expression parseUnaryExpression() {
         if (tokens.match(MINUS, NOT)) {
             Token token = tokens.consumeToken();
@@ -265,8 +296,6 @@ public class CatScriptParser {
         }
     }
 
-
-
     //============================================================
     //  Parse Helpers
     //============================================================
@@ -282,5 +311,4 @@ public class CatScriptParser {
             return tokens.getCurrentToken();
         }
     }
-
 }
