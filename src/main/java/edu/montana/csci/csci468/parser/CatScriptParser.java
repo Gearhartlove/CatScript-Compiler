@@ -1,5 +1,6 @@
 package edu.montana.csci.csci468.parser;
 
+import com.sun.jdi.InvalidTypeException;
 import edu.montana.csci.csci468.parser.expressions.*;
 import edu.montana.csci.csci468.parser.statements.*;
 import edu.montana.csci.csci468.tokenizer.CatScriptTokenizer;
@@ -9,6 +10,7 @@ import edu.montana.csci.csci468.tokenizer.TokenType;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import static edu.montana.csci.csci468.tokenizer.TokenType.*;
 
@@ -58,6 +60,10 @@ public class CatScriptParser {
     //============================================================
 
     private Statement parseProgramStatement() {
+        if (tokens.match(IDENTIFIER)) {
+            Statement assStmt = parseAssignmentStatement();
+            return assStmt;
+        }
         if (tokens.match(VAR)) {
             Statement varStmt = parseVariableStatement();
             return varStmt;
@@ -164,8 +170,14 @@ public class CatScriptParser {
             IdentifierExpression id = (IdentifierExpression) parseExpression();
             varStatement.setVariableName(id.getName());
             if (tokens.match(COLON)) {
-                tokens.consumeToken(); // consume the colon
-                varStatement.setExplicitType(parseTypeExpression());
+                tokens.consumeToken();
+                CatscriptType cstype = parseTypeExpression(varStatement);
+                // parseTypeExpression returns null if no type is matched (invalid type provided)
+                if (cstype == null) {
+                    return new SyntaxErrorStatement(tokens.consumeToken());
+                } else {
+                    varStatement.setExplicitType(cstype);
+                }
             }
             require(EQUAL, varStatement);
             varStatement.setExpression(parseExpression());
@@ -176,6 +188,28 @@ public class CatScriptParser {
         }
     }
 
+    private Statement parseAssignmentStatement() {
+        if (tokens.match(IDENTIFIER)) {
+            AssignmentStatement assStatement = new AssignmentStatement();
+            assStatement.setStart(tokens.consumeToken());
+            assStatement.setVariableName(assStatement.getStart().getStringValue());
+            require(EQUAL, assStatement);
+            assStatement.setExpression(parseExpression());
+            return assStatement;
+        } else {
+            return new SyntaxErrorStatement(tokens.consumeToken());
+        }
+    }
+
+    private Statement parseFunctionCallStatement() {
+        if (tokens.match(FUNCTION)) {
+            Expression funcallExpression = parseExpression();
+            FunctionCallStatement funcallStatement = new FunctionCallStatement((FunctionCallExpression) funcallExpression);
+            return funcallStatement;
+        } else {
+            return new SyntaxErrorStatement(tokens.consumeToken());
+        }
+    }
 
     //============================================================
     //  Expressions
@@ -361,14 +395,28 @@ public class CatScriptParser {
     }
 
     // RFC: is there a better way of doing this?
-    private CatscriptType parseTypeExpression() {
+    private CatscriptType parseTypeExpression(VariableStatement varStatement) {
         Token type = tokens.consumeToken();
-        if (type.getStringValue().equals("int")) {
+        String type_name = type.getStringValue();
+        if (type_name.equals("int")) {
             return CatscriptType.INT;
+        } else if (type_name.equals("string")) {
+            return CatscriptType.STRING;
+        } else if (type_name.equals("bool")) {
+            return CatscriptType.BOOLEAN;
+        } else if (type_name.equals("object")) {
+            return CatscriptType.OBJECT;
+        } else if (type_name.equals("null")) {
+            return CatscriptType.NULL;
+        } else if (type_name.equals("void")) {
+            return CatscriptType.VOID;
+        } else if (type_name.equals("list")) {
+            require(LESS, varStatement);
+            CatscriptType.ListType list_type = new CatscriptType.ListType(Objects.requireNonNull(parseTypeExpression(varStatement)));
+            require(GREATER, varStatement);
+            return list_type;
         }
-        else {
-            return CatscriptType.NULL; // RFC: change this later
-        }
+        return null;
     }
 
     //============================================================

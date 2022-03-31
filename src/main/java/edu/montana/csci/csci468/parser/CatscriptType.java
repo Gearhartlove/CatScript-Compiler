@@ -1,7 +1,6 @@
 package edu.montana.csci.csci468.parser;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class CatscriptType {
 
@@ -12,6 +11,15 @@ public class CatscriptType {
     public static final CatscriptType NULL = new CatscriptType("null", Object.class);
     public static final CatscriptType VOID = new CatscriptType("void", Object.class);
 
+    public static Map<String, CatscriptType> VALID_TYPES = Map.of(
+            "int", INT,
+            "string", STRING,
+            "bool", BOOLEAN,
+            "object", OBJECT,
+            "null", NULL,
+            "void", VOID
+    );
+
     private final String name;
     private final Class javaClass;
 
@@ -19,6 +27,14 @@ public class CatscriptType {
         this.name = name;
         this.javaClass = javaClass;
     }
+
+    public static CatscriptType getCatscriptType(String type_name) {
+        return VALID_TYPES.get(type_name);
+    }
+
+
+    // deal with the
+    // if valid type continue, else
 
     public boolean isAssignableFrom(CatscriptType type) {
         if (type == VOID) {
@@ -60,6 +76,7 @@ public class CatscriptType {
 
     public static class ListType extends CatscriptType {
         private final CatscriptType componentType;
+
         public ListType(CatscriptType componentType) {
             super("list<" + componentType.toString() + ">", List.class);
             this.componentType = componentType;
