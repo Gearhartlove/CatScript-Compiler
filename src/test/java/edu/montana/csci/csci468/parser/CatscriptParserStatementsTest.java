@@ -131,6 +131,7 @@ public class CatscriptParserStatementsTest extends CatscriptTestBase {
         assertTrue(expr.getExpression() instanceof NullLiteralExpression);
     }
 
+    // don't understand this test
     @Test
     public void functionCallStatement() {
         FunctionCallStatement expr = parseStatement("x(1, 2, 3) y = 1", false);
@@ -139,6 +140,7 @@ public class CatscriptParserStatementsTest extends CatscriptTestBase {
         assertEquals(3, expr.getArguments().size());
     }
 
+    //
     @Test
     public void functionDefStatement() {
         FunctionDefinitionStatement expr = parseStatement("function x() {}");

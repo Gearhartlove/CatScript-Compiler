@@ -8,6 +8,7 @@ import edu.montana.csci.csci468.tokenizer.Token;
 import edu.montana.csci.csci468.tokenizer.TokenList;
 import edu.montana.csci.csci468.tokenizer.TokenType;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -60,10 +61,19 @@ public class CatScriptParser {
     //============================================================
 
     private Statement parseProgramStatement() {
-        if (tokens.match(IDENTIFIER)) {
-            Statement assStmt = parseAssignmentStatement();
-            return assStmt;
+        if (tokens.match(FUNCTION)) {
+            Statement functionDefStatement = parseFunctionDefStatement();
+            return functionDefStatement;
         }
+//        if (tokens.match(IDENTIFIER)) {
+//            if (tokens.match(LEFT_PAREN)) {
+//                Statement functionCallStatement = parseFunctionCallStatement();
+//                return functionCallStatement;
+//            } else {
+//                Statement assStmt = parseAssignmentStatement();
+//                return assStmt;
+//            }
+//        }
         if (tokens.match(VAR)) {
             Statement varStmt = parseVariableStatement();
             return varStmt;
@@ -201,15 +211,78 @@ public class CatScriptParser {
         }
     }
 
-    private Statement parseFunctionCallStatement() {
+//    private Statement parseFunctionCallStatement() {
+//        if (tokens.match(FUNCTION)) {
+//            Expression funcallExpression = parseExpression();
+//            FunctionCallStatement funcallStatement = new FunctionCallStatement((FunctionCallExpression) funcallExpression);
+//            return funcallStatement;
+//        } else {
+//            return new SyntaxErrorStatement(tokens.consumeToken());
+//        }
+//    }
+
+    private Statement parseFunctionDefStatement() {
         if (tokens.match(FUNCTION)) {
-            Expression funcallExpression = parseExpression();
-            FunctionCallStatement funcallStatement = new FunctionCallStatement((FunctionCallExpression) funcallExpression);
-            return funcallStatement;
-        } else {
+            FunctionDefinitionStatement functionDefStatement = new FunctionDefinitionStatement();
+            functionDefStatement.setStart(tokens.consumeToken());
+            Token identifier = require(IDENTIFIER, functionDefStatement);
+            functionDefStatement.setName(identifier.getStringValue());
+            require(LEFT_PAREN, functionDefStatement);
+            // parameter list
+            while (!tokens.match(RIGHT_PAREN) && !tokens.match(EOF)) {
+                FunctionDefParameter parameter = parseFunctionDefParameter(functionDefStatement);
+                functionDefStatement.addParameter(parameter.getName(), parameter.getTypeLiteral());
+            }
+            require(RIGHT_PAREN, functionDefStatement);
+            // return type
+            if (tokens.match(COLON)) {
+
+            }
+            else {
+                require(LEFT_BRACE, functionDefStatement);
+//                List<Statement> body = parseFunctionBodyStatement();
+//                functionDefStatement.setBody(body);
+                require(RIGHT_BRACE, functionDefStatement);
+                return functionDefStatement;
+            }
+        }
+        else {
             return new SyntaxErrorStatement(tokens.consumeToken());
         }
     }
+
+    private class FunctionDefParameter {
+        String name;
+        TypeLiteral typeLiteral;
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setTypeLiteral(TypeLiteral typeLiteral) {
+            this.typeLiteral = typeLiteral;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public TypeLiteral getTypeLiteral() {
+            return typeLiteral;
+        }
+    }
+
+    private FunctionDefParameter parseFunctionDefParameter
+            (FunctionDefinitionStatement functionDefStatement) {
+        FunctionDefParameter parameter = new FunctionDefParameter();
+
+        require(COMMA,functionDefStatement);
+        // parse logic
+        return parameter;
+    }
+
+//    private List<Statement> parseFunctionBodyStatement() {
+//    }
 
     //============================================================
     //  Expressions
