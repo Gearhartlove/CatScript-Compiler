@@ -51,11 +51,20 @@ public class VariableStatement extends Statement {
         // ensure explicit type is correct type
         else if (explicitType != null) {
             // ensure
-            boolean result = (explicitType == expression.getType());
-            if (!result) {
+
+            boolean result;
+//            if (CatscriptType.getListType(explicitType) != null) {
+//                CatscriptType test = CatscriptType.getListType(explicitType);
+//                result = CatscriptType.getListType(explicitType) == expression.getType();
+//            } else {
+                result = (explicitType == expression.getType());
+//            }
+            // fix: putting object here feels hackey
+            if (!result && explicitType != CatscriptType.OBJECT) {
                 addError(ErrorType.INCOMPATIBLE_TYPES);
             }
             else {
+                type = explicitType;
                 symbolTable.registerSymbol(variableName, explicitType);
             }
         }
