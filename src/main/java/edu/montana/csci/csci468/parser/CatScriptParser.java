@@ -65,7 +65,7 @@ public class CatScriptParser {
             Statement functionDefStatement = parseFunctionDefStatement();
             return functionDefStatement;
         }
-//        if (tokens.match(IDENTIFIER)) {
+        if (tokens.match(IDENTIFIER)) {
 //            if (tokens.match(LEFT_PAREN)) {
 //                Statement functionCallStatement = parseFunctionCallStatement();
 //                return functionCallStatement;
@@ -73,7 +73,9 @@ public class CatScriptParser {
 //                Statement assStmt = parseAssignmentStatement();
 //                return assStmt;
 //            }
-//        }
+            Statement assignmentStmt = parseAssignmentStatement();
+            return assignmentStmt;
+        }
         if (tokens.match(VAR)) {
             Statement varStmt = parseVariableStatement();
             return varStmt;
@@ -236,9 +238,14 @@ public class CatScriptParser {
             require(RIGHT_PAREN, functionDefStatement);
             // return type todo
             if (tokens.match(COLON)) {
+                tokens.consumeToken(); // consume the :
+                CatscriptType cst = parseTypeExpression(functionDefStatement);
+                TypeLiteral return_type = new TypeLiteral();
+                return_type.setType(cst);
+                functionDefStatement.setType(return_type);
             }
+            // must perform *.setType(null) because this implies the function returns null
             else {
-                // set type to void if no return statement
                 functionDefStatement.setType(null);
             }
             // body
@@ -258,11 +265,6 @@ public class CatScriptParser {
         String name;
         TypeLiteral typeLiteral;
 
-        public FunctionDefParameter(Token token) {
-            this.name = token.getStringValue();
-//            this.typeLiteral = parseTypeExpression();
-        }
-
         public void setName(String name) {
             this.name = name;
         }
@@ -279,8 +281,18 @@ public class CatScriptParser {
 
     private FunctionDefParameter parseFunctionDefParameter
             (FunctionDefinitionStatement functionDefStatement) {
-        FunctionDefParameter parameter = new FunctionDefParameter(tokens.consumeToken());
+        Token id = require(IDENTIFIER, functionDefStatement);
 
+        FunctionDefParameter parameter = new FunctionDefParameter();
+        parameter.setName(id.getStringValue());
+
+        if (tokens.match(COLON)) {
+            tokens.consumeToken();
+            CatscriptType param_type = parseTypeExpression(functionDefStatement);
+            TypeLiteral type_literal = new TypeLiteral();
+            type_literal.setType(param_type);
+            parameter.setTypeLiteral(type_literal);
+        }
         // parse parameter logic
         if (!tokens.match(RIGHT_PAREN)) {
             require(COMMA,functionDefStatement);
@@ -293,8 +305,22 @@ public class CatScriptParser {
             (FunctionDefinitionStatement functionDefStatement) {
         List<Statement> body_statements = new LinkedList<>();
         while (!tokens.match(RIGHT_BRACE) && !tokens.match(EOF)) {
-            Statement statement = parseProgramStatement();
-            body_statements.add(statement);
+            if (tokens.match(RETURN)) {
+                ReturnStatement return_statement = new ReturnStatement();
+                return_statement.setFunctionDefinition(functionDefStatement);
+                return_statement.setToken(tokens.consumeToken());
+                // function will have return type already defined if not returning void
+                if (functionDefStatement.getType() != CatscriptType.VOID) {
+                    return_statement.setExpression(parseExpression());
+                }
+
+                body_statements.add(return_statement);
+                return body_statements;
+            }
+            else {
+                Statement statement = parseProgramStatement();
+                body_statements.add(statement);
+            }
         }
         return body_statements;
     }
@@ -483,7 +509,7 @@ public class CatScriptParser {
     }
 
     // RFC: is there a better way of doing this?
-    private CatscriptType parseTypeExpression(VariableStatement varStatement) {
+    private CatscriptType parseTypeExpression(ParseElement varStatement) {
         Token type = tokens.consumeToken();
         String type_name = type.getStringValue();
         if (type_name.equals("int")) {
