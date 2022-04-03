@@ -234,17 +234,20 @@ public class CatScriptParser {
                 functionDefStatement.addParameter(parameter.getName(), parameter.getTypeLiteral());
             }
             require(RIGHT_PAREN, functionDefStatement);
-            // return type
+            // return type todo
             if (tokens.match(COLON)) {
-
             }
             else {
-                require(LEFT_BRACE, functionDefStatement);
-//                List<Statement> body = parseFunctionBodyStatement();
-//                functionDefStatement.setBody(body);
-                require(RIGHT_BRACE, functionDefStatement);
-                return functionDefStatement;
+                // set type to void if no return statement
+                functionDefStatement.setType(null);
             }
+            // body
+            require(LEFT_BRACE, functionDefStatement);
+            List<Statement> body = parseFunctionBodyStatement(functionDefStatement);
+            functionDefStatement.setBody(body);
+            Token end = require(RIGHT_BRACE, functionDefStatement);
+            functionDefStatement.setEnd(end);
+            return functionDefStatement;
         }
         else {
             return new SyntaxErrorStatement(tokens.consumeToken());
@@ -255,18 +258,20 @@ public class CatScriptParser {
         String name;
         TypeLiteral typeLiteral;
 
+        public FunctionDefParameter(Token token) {
+            this.name = token.getStringValue();
+//            this.typeLiteral = parseTypeExpression();
+        }
+
         public void setName(String name) {
             this.name = name;
         }
-
         public void setTypeLiteral(TypeLiteral typeLiteral) {
             this.typeLiteral = typeLiteral;
         }
-
         public String getName() {
             return name;
         }
-
         public TypeLiteral getTypeLiteral() {
             return typeLiteral;
         }
@@ -274,15 +279,25 @@ public class CatScriptParser {
 
     private FunctionDefParameter parseFunctionDefParameter
             (FunctionDefinitionStatement functionDefStatement) {
-        FunctionDefParameter parameter = new FunctionDefParameter();
+        FunctionDefParameter parameter = new FunctionDefParameter(tokens.consumeToken());
 
-        require(COMMA,functionDefStatement);
-        // parse logic
+        // parse parameter logic
+        if (!tokens.match(RIGHT_PAREN)) {
+            require(COMMA,functionDefStatement);
+        }
+
         return parameter;
     }
 
-//    private List<Statement> parseFunctionBodyStatement() {
-//    }
+    private List<Statement> parseFunctionBodyStatement
+            (FunctionDefinitionStatement functionDefStatement) {
+        List<Statement> body_statements = new LinkedList<>();
+        while (!tokens.match(RIGHT_BRACE) && !tokens.match(EOF)) {
+            Statement statement = parseProgramStatement();
+            body_statements.add(statement);
+        }
+        return body_statements;
+    }
 
     //============================================================
     //  Expressions
