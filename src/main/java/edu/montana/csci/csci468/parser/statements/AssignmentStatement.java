@@ -34,7 +34,11 @@ public class AssignmentStatement extends Statement {
         CatscriptType symbolType = symbolTable.getSymbolType(getVariableName());
         if (symbolType == null) {
             addError(ErrorType.UNKNOWN_NAME);
-        } else {
+        }
+        if (symbolTable.hasSymbol(variableName)) {
+            addError(ErrorType.DUPLICATE_NAME);
+        }
+        else {
             // TOOD - verify compatilibity of types
         }
     }

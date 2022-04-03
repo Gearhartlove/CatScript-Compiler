@@ -191,8 +191,11 @@ public class CatScriptParser {
                     varStatement.setExplicitType(cstype);
                 }
             }
-            require(EQUAL, varStatement);
+            varStatement.setEnd(require(EQUAL, varStatement));
             varStatement.setExpression(parseExpression());
+            if (varStatement.getType() == null) {
+                varStatement.setType(varStatement.getExpression().getType());
+            }
 
             return varStatement;
         } else {
@@ -212,16 +215,6 @@ public class CatScriptParser {
             return new SyntaxErrorStatement(tokens.consumeToken());
         }
     }
-
-//    private Statement parseFunctionCallStatement() {
-//        if (tokens.match(FUNCTION)) {
-//            Expression funcallExpression = parseExpression();
-//            FunctionCallStatement funcallStatement = new FunctionCallStatement((FunctionCallExpression) funcallExpression);
-//            return funcallStatement;
-//        } else {
-//            return new SyntaxErrorStatement(tokens.consumeToken());
-//        }
-//    }
 
     private Statement parseFunctionDefStatement() {
         if (tokens.match(FUNCTION)) {

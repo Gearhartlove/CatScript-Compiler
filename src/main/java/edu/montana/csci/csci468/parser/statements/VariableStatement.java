@@ -34,6 +34,8 @@ public class VariableStatement extends Statement {
         this.explicitType = type;
     }
 
+    public void setType(CatscriptType type) {this.type = type; }
+
     public CatscriptType getExplicitType() {
         return explicitType;
     }
@@ -49,7 +51,7 @@ public class VariableStatement extends Statement {
             addError(ErrorType.DUPLICATE_NAME);
         } else {
             // TODO if there is an explicit type, ensure it is correct
-            //      if not, infer the type from the right hand side expression
+            //      if not, infer the tpe from the right hand side expression
             symbolTable.registerSymbol(variableName, type);
         }
     }
