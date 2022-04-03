@@ -51,7 +51,13 @@ public class VariableStatement extends Statement {
             addError(ErrorType.DUPLICATE_NAME);
         } else {
             // TODO if there is an explicit type, ensure it is correct
-            //      if not, infer the tpe from the right hand side expression
+            //      if not, infer the the from the right hand side expression
+            // Q: why do we infer when we validate as opposed to when we parse?
+            // todo ^ fix this issue
+            if (explicitType != expression.getType()) {
+                addError(ErrorType.INCOMPATIBLE_TYPES);
+                // todo add the inference by taking it out of the parcer
+            }
             symbolTable.registerSymbol(variableName, type);
         }
     }
