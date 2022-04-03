@@ -193,9 +193,7 @@ public class CatScriptParser {
             }
             varStatement.setEnd(require(EQUAL, varStatement));
             varStatement.setExpression(parseExpression());
-            if (varStatement.getType() == null) {
-                varStatement.setType(varStatement.getExpression().getType());
-            }
+
 
             return varStatement;
         } else {

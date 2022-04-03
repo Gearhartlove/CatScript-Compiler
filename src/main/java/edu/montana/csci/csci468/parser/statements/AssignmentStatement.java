@@ -35,12 +35,13 @@ public class AssignmentStatement extends Statement {
         if (symbolType == null) {
             addError(ErrorType.UNKNOWN_NAME);
         }
-        if (symbolTable.hasSymbol(variableName)) {
-            addError(ErrorType.DUPLICATE_NAME);
+//        else if (symbolTable.hasSymbol(variableName)) {
+//            addError(ErrorType.DUPLICATE_NAME);
+//        }
+        else if (symbolType != expression.getType()) {
+            addError(ErrorType.INCOMPATIBLE_TYPES);
         }
-        else {
-            // TOOD - verify compatilibity of types
-        }
+
     }
 
     //==============================================================

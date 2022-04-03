@@ -34,8 +34,6 @@ public class VariableStatement extends Statement {
         this.explicitType = type;
     }
 
-    public void setType(CatscriptType type) {this.type = type; }
-
     public CatscriptType getExplicitType() {
         return explicitType;
     }
@@ -49,17 +47,30 @@ public class VariableStatement extends Statement {
         expression.validate(symbolTable);
         if (symbolTable.hasSymbol(variableName)) {
             addError(ErrorType.DUPLICATE_NAME);
-        } else {
-            // TODO if there is an explicit type, ensure it is correct
-            //      if not, infer the the from the right hand side expression
-            // Q: why do we infer when we validate as opposed to when we parse?
-            // todo ^ fix this issue
-            if (explicitType != expression.getType()) {
+        }
+        // ensure explicit type is correct type
+        else if (explicitType != null) {
+            // ensure
+            boolean result = (explicitType == expression.getType());
+            if (!result) {
                 addError(ErrorType.INCOMPATIBLE_TYPES);
-                // todo add the inference by taking it out of the parcer
             }
+            else {
+                symbolTable.registerSymbol(variableName, explicitType);
+            }
+        }
+        // infer type from expression
+        else {
+            type = expression.getType();
+//            explicitType = expression.getType(); // do I set an explit type here now?
             symbolTable.registerSymbol(variableName, type);
         }
+
+//            // TODO if there is an explicit type, ensure it is correct
+//            //      if not, infer the the from the right hand side expression
+//            // Q: why do we infer when we validate as opposed to when we parse?
+//            // todo ^ fix this issue
+//        }
     }
 
     public CatscriptType getType() {
