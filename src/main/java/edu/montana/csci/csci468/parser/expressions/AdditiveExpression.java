@@ -67,13 +67,32 @@ public class AdditiveExpression extends Expression {
 
     @Override
     public Object evaluate(CatscriptRuntime runtime) {
-        Integer lhsValue = (Integer) leftHandSide.evaluate(runtime);
-        Integer rhsValue = (Integer) rightHandSide.evaluate(runtime);
-        //TODO handle string case
-        if (isAdd()) {
-            return lhsValue + rhsValue;
-        } else {
-            return lhsValue - rhsValue;
+        if (leftHandSide.getType() == CatscriptType.STRING || rightHandSide.getType() == CatscriptType.STRING) {
+            // null type has no .toString() and results in nullPointerException
+            String lhs;
+            String rhs;
+            if (leftHandSide instanceof NullLiteralExpression) {
+                lhs = "null";
+            } else {
+                lhs = leftHandSide.evaluate(runtime).toString();
+            }
+            if (rightHandSide instanceof NullLiteralExpression) {
+                rhs = "null";
+            } else {
+                rhs = rightHandSide.evaluate(runtime).toString();
+            }
+            String concatenation = lhs + rhs;
+            return concatenation;
+        }
+        else {
+            Integer lhsValue = (Integer) leftHandSide.evaluate(runtime);
+            Integer rhsValue = (Integer) rightHandSide.evaluate(runtime);
+            //TODO handle string case
+            if (isAdd()) {
+                return lhsValue + rhsValue;
+            } else {
+                return lhsValue - rhsValue;
+            }
         }
     }
 

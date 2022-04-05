@@ -33,6 +33,10 @@ public class FactorExpression extends Expression {
         return operator.getType() == TokenType.STAR;
     }
 
+    public boolean isDivide() {
+        return operator.getType() == TokenType.SLASH;
+    }
+
     @Override
     public String toString() {
         return super.toString() + "[" + operator.getStringValue() + "]";
@@ -61,7 +65,14 @@ public class FactorExpression extends Expression {
 
     @Override
     public Object evaluate(CatscriptRuntime runtime) {
-        return super.evaluate(runtime);
+        Integer rhs = (Integer) rightHandSide.evaluate(runtime);
+        Integer lhs = (Integer) leftHandSide.evaluate(runtime);
+        if (isDivide()) {
+            return lhs / rhs;
+        }
+        else {
+            return lhs * rhs;
+        }
     }
 
     @Override

@@ -57,7 +57,8 @@ public class VariableStatement extends Statement {
 //                CatscriptType test = CatscriptType.getListType(explicitType);
 //                result = CatscriptType.getListType(explicitType) == expression.getType();
 //            } else {
-                result = (explicitType == expression.getType());
+//                result = (explicitType == expression.getType());
+                result = (explicitType.isAssignableFrom(expression.getType()));
 //            }
             // fix: putting object here feels hackey
             if (!result && explicitType != CatscriptType.OBJECT) {
@@ -74,12 +75,6 @@ public class VariableStatement extends Statement {
 //            explicitType = expression.getType(); // do I set an explit type here now?
             symbolTable.registerSymbol(variableName, type);
         }
-
-//            // TODO if there is an explicit type, ensure it is correct
-//            //      if not, infer the the from the right hand side expression
-//            // Q: why do we infer when we validate as opposed to when we parse?
-//            // todo ^ fix this issue
-//        }
     }
 
     public CatscriptType getType() {
