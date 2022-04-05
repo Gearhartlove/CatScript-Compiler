@@ -97,7 +97,9 @@ public class CatScriptParser {
     }
 
     private Statement parseFunctionCallStatement(Token identifier) {
-        return new FunctionCallStatement(parseFunctionCallExpression(identifier));
+        FunctionCallExpression functionCallExpression = parseFunctionCallExpression(identifier);
+        FunctionCallStatement functionCallStatement = new FunctionCallStatement(functionCallExpression);
+        return functionCallStatement;
     }
 
     private Statement parsePrintStatement() {
@@ -337,8 +339,11 @@ public class CatScriptParser {
                 functionCallExpression.addError(ErrorType.UNTERMINATED_ARG_LIST);
                 return functionCallExpression;
             }
-            tokens.consumeToken(); // consume the '(', or the ','
+            if(!tokens.match(RIGHT_PAREN)) {
+                tokens.consumeToken(); // consume the '(', or the ','
+            }
         }
+        tokens.consumeToken(); // consume the ')'
         FunctionCallExpression functionCallExpression =
                 new FunctionCallExpression(identifierToken.getStringValue(), arguments);
         return functionCallExpression;
