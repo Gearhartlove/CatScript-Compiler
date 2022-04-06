@@ -95,13 +95,9 @@ public class CatscriptFunctionArgsAndReturnEvalTest extends CatscriptTestBase
                 "print(foo())"));
     }
 
-
     @Test
     void returnListWithComponentTypeWorksProperly() {
         assertEquals("[1, 2, 3]\n", executeProgram("function foo() : list<int> { return [1, 2, 3] }" +
                 "print(foo())"));
     }
-
-
-
 }

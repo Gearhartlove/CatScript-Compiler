@@ -520,10 +520,16 @@ public class CatScriptParser {
         } else if (type_name.equals("void")) {
             return CatscriptType.VOID;
         } else if (type_name.equals("list")) {
-            require(LESS, varStatement);
-            CatscriptType.ListType list_type = new CatscriptType.ListType(Objects.requireNonNull(parseTypeExpression(varStatement)));
-            require(GREATER, varStatement);
-            return list_type;
+
+            if (tokens.match(LESS)) {
+                require(LESS, varStatement);
+                CatscriptType.ListType list_type = new CatscriptType.ListType(Objects.requireNonNull(parseTypeExpression(varStatement)));
+                require(GREATER, varStatement);
+                return list_type;
+            } else {
+                var test = new CatscriptType.ListType(CatscriptType.OBJECT);
+                return test;
+            }
         }
         return null;
     }
