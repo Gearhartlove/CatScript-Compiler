@@ -495,6 +495,7 @@ public class CatScriptParser {
             Token left_paren_token = tokens.consumeToken();
             ParenthesizedExpression parenthesizedExpression = new ParenthesizedExpression(parseExpression());
             parenthesizedExpression.setToken(left_paren_token);
+            tokens.consumeToken();
             return parenthesizedExpression;
         } else {
             SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression(tokens.consumeToken());
