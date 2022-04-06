@@ -8,6 +8,7 @@ import edu.montana.csci.csci468.parser.ParseError;
 import edu.montana.csci.csci468.parser.SymbolTable;
 import edu.montana.csci.csci468.parser.expressions.Expression;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,7 +74,18 @@ public class ForStatement extends Statement {
     //==============================================================
     @Override
     public void execute(CatscriptRuntime runtime) {
-        super.execute(runtime);
+        var arg_list = expression.evaluate(runtime);
+        if (arg_list instanceof ArrayList) {
+            for (Object i : (ArrayList) arg_list) {
+                int set_name_to = (int) i;
+                runtime.setValue(variableName, set_name_to);
+
+                for (Statement s : body) {
+                    s.execute(runtime);
+                }
+
+            }
+        }
     }
 
     @Override
