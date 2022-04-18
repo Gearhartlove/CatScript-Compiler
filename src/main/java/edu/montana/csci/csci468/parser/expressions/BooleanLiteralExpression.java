@@ -1,5 +1,6 @@
 package edu.montana.csci.csci468.parser.expressions;
 
+import com.sun.jdi.BooleanValue;
 import edu.montana.csci.csci468.bytecode.ByteCodeGenerator;
 import edu.montana.csci.csci468.eval.CatscriptRuntime;
 import edu.montana.csci.csci468.parser.CatscriptType;
@@ -40,7 +41,8 @@ public class BooleanLiteralExpression extends Expression {
 
     @Override
     public void compile(ByteCodeGenerator code) {
-        super.compile(code);
+        // push literal onto the stack
+        code.pushConstantOntoStack(booleanValue);
     }
 
 }
