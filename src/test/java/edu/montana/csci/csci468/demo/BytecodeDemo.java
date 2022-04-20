@@ -1,16 +1,11 @@
 package edu.montana.csci.csci468.demo;
 
+import java.util.ArrayList;
+
 public class BytecodeDemo {
 
-//    int add(int i) {
-//        return i + 13;
-//    }
     void foo() {
-        int x = 1;
-        if (x > 1) {
-            System.out.println("Greater");
-        } else {
-            System.out.println("Less");
-        }
+        //var x = new [1,2,3]
+        var x = 10;
     }
 }

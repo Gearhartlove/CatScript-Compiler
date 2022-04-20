@@ -2,10 +2,8 @@ package edu.montana.csci.csci468.parser.expressions;
 
 import edu.montana.csci.csci468.bytecode.ByteCodeGenerator;
 import edu.montana.csci.csci468.eval.CatscriptRuntime;
-import edu.montana.csci.csci468.parser.CatscriptType;
-import edu.montana.csci.csci468.parser.ErrorType;
-import edu.montana.csci.csci468.parser.ParseError;
-import edu.montana.csci.csci468.parser.SymbolTable;
+import edu.montana.csci.csci468.parser.*;
+import org.objectweb.asm.Opcodes;
 
 public class IdentifierExpression extends Expression {
     private final String name;
@@ -50,7 +48,17 @@ public class IdentifierExpression extends Expression {
 
     @Override
     public void compile(ByteCodeGenerator code) {
-        super.compile(code);
+        // reverse of VariableExpression compile: end of 4/20/22 lecture
+        Integer integer = code.resolveLocalStorageSlotFor(name);
+        if (integer != null) {
+            // local var
+            // ILOAD or ALOAD here depending on type
+        } else {
+            // field
+            code.addVarInstruction(Opcodes.ALOAD, 0);
+            // GETFIELD , look similar to varstatement putfield
+            // depends on integer or reference type
+        }
     }
 
 
