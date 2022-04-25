@@ -21,3 +21,10 @@ Notes on each section
 * Section 6: Design trade-offs - You must write this, maybe discuss recursive descent vs. a parser generator?
 * Section 7: Software development life cycle model - We did Test Driven Development, please discuss your experience with it
 
+## Section 1: Program
+program link
+## Teamwork
+## Design Pattern
+Catscript uses the memoization patter to memoize type access in the getListType() method in the CatscriptType.java code. This pattern "accelerates performance by caching the return values of expensive function calls" (cloudsavvit.com). A hashmap is created which stores the catscript type. If the quereid CatscriptType exists in the hashmap, the cached result is returned. If the queired CatscriptType does not yet exist, than a new CatscriptType is instantiated and added to the Hashmap. This removes redunant instances of CatscripType ListTypes existing, when they are already instantiated.
+
+reference(s): https://www.cloudsavvyit.com/12446/what-is-memoization-and-why-does-it-matter/
