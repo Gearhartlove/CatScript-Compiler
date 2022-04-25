@@ -78,4 +78,12 @@ public class CatscriptBasicExpressionEvalTest extends CatscriptTestBase {
         assertEquals(1, evaluateExpression("(1)"));
     }
 
+    @Test
+    void logicalExpressionEvaluatesProperly() {
+        assertEquals(true, evaluateExpression("true && true"));
+        assertEquals(false, evaluateExpression("false && true"));
+        assertEquals(true, evaluateExpression("true || false"));
+        assertEquals(false, evaluateExpression("false || false"));
+    }
+
 }

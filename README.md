@@ -90,7 +90,11 @@ comparison_expression = additive_expression { (">" | ">=" | "<" | "<=" ) additiv
 
 additive_expression = factor_expression { ("+" | "-" ) factor_expression };
 
-factor_expression = unary_expression { ("/" | "*" ) unary_expression };
+factor_expression = logical_expression { ("/" | "*" ) logical_expression };
+
+logical_expression = unary_expression { ("&&" | "||" ) unary_expression };
+
+// TODO: logical_expression add to gramar
 
 unary_expression = ( "not" | "-" ) unary_expression | primary_expression;
 

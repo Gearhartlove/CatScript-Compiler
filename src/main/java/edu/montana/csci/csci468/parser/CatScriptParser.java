@@ -399,7 +399,7 @@ public class CatScriptParser {
     }
 
     private Expression parseFactorExpression() {
-        Expression expression = parseUnaryExpression();
+        Expression expression = parseLogicalExpression();
         Expression rightHandSide;
         while (tokens.match(STAR, SLASH)) {
             Token operator = tokens.consumeToken();
@@ -410,11 +410,25 @@ public class CatScriptParser {
 //            } else {
 //                rightHandSide = parseUnaryExpression();
 //            }
-            rightHandSide = parseUnaryExpression();
+            rightHandSide = parseLogicalExpression();
             FactorExpression factorExpression = new FactorExpression(operator, expression, rightHandSide);
             factorExpression.setStart(expression.getStart());
             factorExpression.setEnd(rightHandSide.getEnd());
             expression = factorExpression;
+        }
+        return expression;
+    }
+
+    private Expression parseLogicalExpression() {
+        Expression expression = parseUnaryExpression();
+        Expression rightHandSide;
+        while (tokens.match(LOR, LAND)) {
+            Token operator = tokens.consumeToken();
+            rightHandSide = parseUnaryExpression();
+            LogicalExpression logicalExpression = new LogicalExpression(operator, expression, rightHandSide);
+            logicalExpression.setStart(expression.getStart());
+            logicalExpression.setEnd(rightHandSide.getEnd());
+            expression = logicalExpression;
         }
         return expression;
     }

@@ -163,7 +163,18 @@ public class CatScriptTokenizer {
             } else {
                 tokenList.addToken(EQUAL, "=", start, postion, line, lineOffset);
             }
-        } else {
+        }
+        else if (matchAndConsume('&')) {
+            if (matchAndConsume(('&'))) {
+                tokenList.addToken(LAND, "&&", start, postion, line, lineOffset);
+            }
+        }
+        else if (matchAndConsume('|')) {
+            if (matchAndConsume('|')) {
+                tokenList.addToken(LOR, "||", start, postion, line, lineOffset);
+            }
+        }
+        else {
             tokenList.addToken(ERROR, "<Unexpected Token: [" + takeChar() + "]>", start, postion, line, lineOffset);
         }
     }
