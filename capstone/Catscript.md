@@ -9,14 +9,29 @@ This document should be used to create a guide for catscript, to satisfy capston
 
 ### CatScript Typing
 #### Booleans
-True and false represents the logical true and false respectively.
+True and false represents the logical `true` and `false` respectively.
 ```js
-true
-false
+true  // evaluates to logical true
+false // evaluates to logical false 
 ```
 #### Integers
-
+The 32 bit signed `integer` type.
+```js
+-100 
+0
+100
+```
 #### Strings
+A UTF-8-encoded, growable string. Supports string concatentation. 
+##### Examples
+You can create a `string` using the "word" syntax.
+```js
+"Hello"
+```
+You can concatenate strings using the `+` operator.
+```js
+"Hello World" == "Hello " + "World" // evaluates to true
+```
 #### Lists
 #### Null
 #### Object
