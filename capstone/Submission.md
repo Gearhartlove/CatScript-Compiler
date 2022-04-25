@@ -23,8 +23,17 @@ Notes on each section
 
 ## Section 1: Program
 program link
-## Teamwork
-## Design Pattern
-Catscript uses the memoization patter to memoize type access in the getListType() method in the CatscriptType.java code. This pattern "accelerates performance by caching the return values of expensive function calls" (cloudsavvit.com). A hashmap is created which stores the catscript type. If the quereid CatscriptType exists in the hashmap, the cached result is returned. If the queired CatscriptType does not yet exist, than a new CatscriptType is instantiated and added to the Hashmap. This removes redunant instances of CatscripType ListTypes existing, when they are already instantiated.
+## Section 2: Teamwork
+## Section 3: Design Pattern
+Catscript uses the memoization patter to memoize type access in the getListType() method in the CatscriptType.java code. This pattern "accelerates performance by caching the return values of expensive function calls" ([cloudsavvit.com](https://www.cloudsavvyit.com/12446/what-is-memoization-and-why-does-it-matter/)). A hashmap is created which stores the catscript type. If the quereid CatscriptType exists in the hashmap, the cached result is returned. If the queired CatscriptType does not yet exist, than a new CatscriptType is instantiated and added to the Hashmap. This removes redunant instances of CatscriptType ListTypes existing, when they are already instantiated.
 
-reference(s): https://www.cloudsavvyit.com/12446/what-is-memoization-and-why-does-it-matter/
+reference(s): 
+## Section 4: Technical Writing
+// ask about documentation here
+## Section 5: UML Sequence Diagrams
+1. Parser
+2. Tokenizer
+## Section 6: Design Tradeoffs
+While programming CatScript, a number of design decisions were made. The most prevelent is why we chose a recursive descent parser, as opposed to a more conventional parser generator (such as [ANTLR](https://www.antlr.org/)). The primary reasons are readability, educational, and debugability. When writing a recursive descent parser, it is much easier to . . . 
+## Section 7: Software Development Life Cycle Model
+A Test Driven Development software development life cycle model was used throughout the entire project. Hundreds of tests were provided which correlated to specific milestones during the compiler's development. For example, the tokenizer, parser, and bytecode compilation all included tests which must pass in order for the compiler to work. This process was seemless, easy to follow, and efficient when designing the various components of the compiler.
