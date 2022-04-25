@@ -1,5 +1,6 @@
 package edu.montana.csci.csci468.tokenizer;
 
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +22,14 @@ public enum TokenType {
     ELSE, FALSE, FUNCTION, FOR, IF, IN, NOT, NULL,
     PRINT, RETURN, TRUE, VAR,
 
+    // logic
+    LAND,
+    LOR,
+
     ERROR,
     EOF;
+
+
 
     public static final Map<String, TokenType> KEYWORDS = new HashMap<>();
     static {

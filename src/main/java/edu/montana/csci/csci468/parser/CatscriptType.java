@@ -48,7 +48,15 @@ public class CatscriptType {
     }
 
     // TODO memoize this call
+    // declare a hash map to live along the method, then when asked for a given list type, look
+    // into the hash map and return it, otherwise create it, add it to the hashmap and return it
+    static HashMap<CatscriptType, ListType> cache = new HashMap<>();
     public static CatscriptType getListType(CatscriptType type) {
+        ListType listType = cache.get(type);
+        if (listType == null) {
+            listType = new ListType(type);
+            cache.put(type, listType);
+        }
         return new ListType(type);
     }
 

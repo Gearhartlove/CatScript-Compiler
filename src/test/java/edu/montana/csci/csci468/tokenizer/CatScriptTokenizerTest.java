@@ -146,5 +146,11 @@ public class CatScriptTokenizerTest extends CatscriptTestBase {
                 VAR, IDENTIFIER, EQUAL, INTEGER, EOF);
     }
 
+    @Test
+    public void logicalExpressionIsCorrect() {
+        assertTokensAre("true && false", TRUE, LAND, FALSE, EOF);
+        assertTokensAre("true || false", TRUE, LOR, FALSE, EOF);
+    }
+
 
 }

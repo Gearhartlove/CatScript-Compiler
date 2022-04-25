@@ -199,4 +199,12 @@ public class CatscriptParserExpressionsTest extends CatscriptTestBase {
         assertFalse(expr.isEqual());
     }
 
+    @Test
+    public void logicalExpression() {
+        LogicalExpression expr = parseExpression("true && false");
+        assertTrue(expr.isAnd());
+        expr = parseExpression("true || false");
+        assertFalse(expr.isAnd());
+    }
+
 }
