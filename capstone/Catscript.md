@@ -1,12 +1,7 @@
 # Catscript Guide
-// note : use tests for example
-
-This document should be used to create a guide for catscript, to satisfy capstone requirement 4
-
 ## Introduction
-
+Catscript is a toy programming language compiled by a custom tokenizer, parser, and evaluater created in MSU's CSCI 468 class. It is a statically typed language, offers a small type system, and includes logic for functions, loops, and conditional logic. 
 ## Features
-
 ### CatScript Typing
 #### Booleans
 True and false represents the logical `true` and `false` respectively.
@@ -133,9 +128,41 @@ output: x is 1 x is not 2
 TODO: improve? 
 ```
 ### Print Statements
-
+A conventional print statement used to output information to the user in the console. This is the only built in function Catscript supports.
+```js
+print("Hello CatScript") // executes to output "Hello Catscript" 
+```
 ### Functions
+
+The `function` keywords lets you define a function `identifer`, optional parameters, an optinoal return type, and a function body. Function bodies encapsulate logic and enter a new scope. When referencing varaibles or data, the current scope will be searched first. The `return` keyword is required when an explicit return type is defined in the function definition. If no explicit type is defined, `void` is returned. 
+#### Examples
+Functions can have no parameters.
+```js
+function foo() {}
+```
+Functions can have parameters.
+```js
+function add_one(number) {
+    number + 1 
+}
+```
+Functions can have parameters with explicit types.
+```js
+function add_one(number: int) {
+    number + 1
+} 
+```
+Functions can return void or they can return an explicit type.
+```js
+function add_one(number: int) {
+    number + 1
+}
+function add_one(number: int): int {
+    return number + 1
+}
+```
 #### Definitions
+
 #### Function Calls
 #### Returning Values
 ### Variables
