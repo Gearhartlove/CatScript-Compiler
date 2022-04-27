@@ -70,6 +70,14 @@ Subtract two factor expressions together with the binary `-` operator.
 1 - 1 // evaluates to 0
 (4*5) - 3 // evaluates to (4*5)-3 -> 20-3 -> 17
 ```
+#### Logical
+Compare two expressions using the `&&` or `||` operator. 
+```js
+true && false // evaluates to false
+true && true // evaluates to true
+true || false // evaluates to true
+false || false // evaluates to false
+```
 #### Multiplication
 Multiply two logical expressions together with binary `*` operator.
 ```js
@@ -134,7 +142,7 @@ print("Hello CatScript") // executes to output "Hello Catscript"
 ```
 ### Functions
 
-The `function` keywords lets you define a function `identifer`, optional parameters, an optinoal return type, and a function body. Function bodies encapsulate logic and enter a new scope. When referencing varaibles or data, the current scope will be searched first. The `return` keyword is required when an explicit return type is defined in the function definition. If no explicit type is defined, `void` is returned. 
+The `function` keywords lets you define a function `identifer`, optional parameters, an optinoal return type, and a function body. Function bodies encapsulate logic and enter a new scope. When referencing varaibles or data, the current scope will be searched first. See `Returning Values` for examples and information on returning values from functions. 
 #### Examples
 Functions can have no parameters.
 ```js
@@ -152,7 +160,18 @@ function add_one(number: int) {
     number + 1
 } 
 ```
-Functions can return void or they can return an explicit type.
+
+#### Definitions
+???
+#### Function Calls
+Functions are called using two parentheses following the function identifier.
+```js
+function foo() {}
+
+foo() // the code inside the foo function block executes
+```
+#### Returning Values
+Functions can return void or they can return an explicit type. The `return` keyword is required when an explicit return type is defined in the function definition. If no explicit type is defined, `void` is returned.
 ```js
 function add_one(number: int) {
     number + 1
@@ -161,10 +180,17 @@ function add_one(number: int): int {
     return number + 1
 }
 ```
-#### Definitions
-
-#### Function Calls
-#### Returning Values
 ### Variables
-#### Declaration
+Data can be captured using variables. Every variable has an identifier and an assigned value. The value is of any type in the CatScript programming language.  Variables are defined using the `var` keyword. 
+```js
+var x = 10
+var y = "foo"
+var z = null
+```
 #### Assignment
+Variables can be assigned to other pieces of data using the `=` operator. The considered variable must be assignable from the considered value. 
+```js
+var x = 10
+x = 20 
+x = "foo" // incompatable types error
+```
