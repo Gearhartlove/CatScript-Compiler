@@ -62,16 +62,35 @@ An immutible collection of the same type.
 #### Example
 ```js
 [1,2,3] // list literal expression 
-var my_string_list: string = ["hello", "world"] // statement with list type
-var my_object_list: object = [null, 3, "foo"]
+var my_string_list: list<string> = ["hello", "world"] // statement with list type
+var my_object_list: list<object> = [null, 3, "foo"]
 ```
 ### CatScript Operations
 #### Adding
+Add two factor expressions together with the binary `+` operator.
+####Example
+```js
+1 + 1 // evaluates to 2
+4 * 5 + 3 // evaulautes to (4*5)+3 -> 20+3 -> 23
+```
 #### Subtracting
+Subtract two factor expressions together with the binary `-` operator.
+```js
+1 - 1 // evaluates to 0
+(4*5) - 3 // evaluates to (4*5)-3 -> 20-3 -> 17
+```
 #### Multiplication
+Multiply two logical expressions together with binary `*` operator.
+```js
+1 * 8 // evaluates to 8
+1 * 2 * 3 // evaluates to 6
+```
 #### Division
-
-
+```js
+6 / 3  // evaluates to 2
+6 / 4  // evaluates to 1
+6 / 10 // evaluates to 0
+```
 ### For loops
 ### If Statements
 ### Print Statements
