@@ -1,0 +1,4 @@
+Errors:
+
+- Missing source zip
+- Missing kristoff_finley_portfolio.pdf
