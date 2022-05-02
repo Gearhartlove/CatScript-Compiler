@@ -47,7 +47,7 @@ var my_list: list<object> = ["hello", 3, null]
 #### Void
 The default return type of a function that does not explicitly return something. Returns the equivalent of nothing. Note, this is different from null.
 ```js
-function foo() {} // returns nothing (also know as void)
+function foo() {} // returns nothing (also known as void)
 function add_one(x: int) : int { return x + 1} // returns and integer (x+1)
 ```
 #### Lists
