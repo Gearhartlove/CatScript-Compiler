@@ -22,12 +22,12 @@ Notes on each section
 * Section 7: Software development life cycle model - We did Test Driven Development, please discuss your experience with it
 
 ## Section 1: Program
-program link
+[sourcecode](https://github.com/Gearhartlove/CatScript-Compiler/blob/master/capstone/source.zip)
 ## Section 2: Teamwork
+
 ## Section 3: Design Pattern
 Catscript uses the memoization patter to memoize type access in the getListType() method in the CatscriptType.java code. This pattern "accelerates performance by caching the return values of expensive function calls" ([cloudsavvit.com](https://www.cloudsavvyit.com/12446/what-is-memoization-and-why-does-it-matter/)). A hashmap is created which stores the catscript type. If the quereid CatscriptType exists in the hashmap, the cached result is returned. If the queired CatscriptType does not yet exist, than a new CatscriptType is instantiated and added to the Hashmap. This removes redunant instances of CatscriptType ListTypes existing, when they are already instantiated.
 
-reference(s): 
 ## Section 4: Technical Writing
 // ask about documentation here
 ## Section 5: UML Sequence Diagrams
